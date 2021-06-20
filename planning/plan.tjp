@@ -333,7 +333,7 @@ task sdpPlatform "SDP" {
       allocate dataSteward1
       allocate appDev1
 
-      depends !platformDevelopment.developPlatform.developDataLakehouse_level2
+      depends sdpPlatform.platformDevelopment.developPlatform.developDataLakehouse.developDataLakehouse_level2
     }
 
     #
