@@ -353,6 +353,14 @@ task sdpPlatform "SDP" {
       depends !developExperimentalDataAnalysis
     }
 
+    task developDataProjection "Develop data projection" {
+      duration 20d
+      allocate platformEng2
+      allocate platformArchitect
+
+      depends sdpPlatform.platformDevelopment.dev_Platform.dev_DataLakehouse.level2
+      depends sdpPlatform.platformDevelopment.dev_Platform.dev_OrchestrationEngine.level2
+    }
     #todo
   }
 
