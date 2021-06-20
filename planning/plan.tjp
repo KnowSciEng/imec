@@ -248,57 +248,65 @@ task sdpPlatform "SDP" {
       }
 
       # -------------------------------------------------------------------------
-      task developPlatform "Develop platform" {
+      task dev_Platform "Develop platform" {
 
           depends !platformReadyToDevelop
 
           # see
-          task developDataLakehouse "Develop  (component) data lakehouse" {
+          task dev_DataLakehouse "Develop  (component) data lakehouse" {
 
-            task developDataLakehouse_level1 "Develop data lakehouse - unit test level" {
+            task level1 "Develop data lakehouse - unit test level" {
               allocate platformEng1, platformEng2, platformArchitect
               length 30d
             }
 
-            task developDataLakehouse_level2 "Develop data lakehouse - data collection DEV-ENV level" {
+            task level2 "Develop data lakehouse - data collection DEV-ENV level" {
               allocate platformEng1, platformEng2, platformArchitect
               length 30d
+
+              depends !level1
             }
 
-            task developDataLakehouse_level3 "Develop data lakehouse - data collection DIT-ENV level"  {
+            task level3 "Develop data lakehouse - data collection DIT-ENV level"  {
               allocate platformEng1, platformEng2, platformArchitect
               length 30d
+
+              depends !level2
             }
           }
 
           # see ..
-          task developAssetRegistry "Develop (component) asset-registry" {
+          task dev_AssetRegistry "Develop (component) asset-registry" {
 
-            task developAssetRegistry_level1 "Develop asset registry - unit test level" {
+            task level1 "Develop asset registry - unit test level" {
               allocate platformEng3, architect2
               length 30d
             }
 
-            task developAssetRegistry_level2 "Develop asset registry - dataset governance" {
+            task level2 "Develop asset registry - dataset governance" {
               allocate platformEng3, architect2
               length 30d
+
+              depends !level1
             }
 
-            task developAssetRegistry_level3 "Develop asset registry - model governance" {
+            task level3 "Develop asset registry - model governance" {
               allocate platformEng3, architect2
               length 30d
+
+              depends !level2
             }
           }
 
           # see
-          task developOrchestrationEngine "Develop orchestration engine" {
+          task dev_OrchestrationEngine "Develop orchestration engine" {
 
-            task developOrchestrationEngine_level1 "Develop orchestration engine - unit test level" {
+            task level1 "Develop orchestration engine - unit test level" {
               allocate platformEng2, platformArchitect
               length 10d
             }
 
-            task developOrchestrationEngine_level2 "Develop orchestration engine - simple data projection level" {
+            task level2 "Develop orchestration engine - simple data projection level" {
               allocate platformEng2, platformArchitect
               length 10d
             }
@@ -312,7 +320,7 @@ task sdpPlatform "SDP" {
         milestone
         #start 2016-03-10
 
-        depends !developPlatform
+        depends !dev_Platform
       }
   }
 
@@ -333,7 +341,7 @@ task sdpPlatform "SDP" {
       allocate dataSteward1
       allocate appDev1
 
-      depends sdpPlatform.platformDevelopment.developPlatform.developDataLakehouse.developDataLakehouse_level2
+      depends sdpPlatform.platformDevelopment.dev_Platform.dev_DataLakehouse.level2
     }
 
     #
@@ -366,7 +374,7 @@ task sdpPlatform "SDP" {
     }
 
     # see
-    #task developPlatformEnv "Develop platform PROD-ENV" {
+    #task dev_PlatformEnv "Develop platform PROD-ENV" {
 
     #  depends !developDevEnv
     #  length 120d
