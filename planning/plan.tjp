@@ -1,0 +1,653 @@
+project Imec "SDP & Affiliates" "1.0" 2021-03-01 +9m {
+
+  # Pick a day during the project that will be reported as 'today' in
+  # the project reports. If not specified, the current day will be
+  # used, but this will likely be outside of the project range, so it
+  # can't be seen in the reports.
+  now 2021-01-24-12:00
+  # Hide the clock time. Only show the date.
+  timeformat "%Y-%m-%d"
+  # The currency for all money values is the Euro.
+  currency "EUR"
+
+  # We want to compare the baseline scenario to one with a slightly
+  # delayed start.
+  scenario plan "Plan" {
+    # Mark all paths as critical that have less than 10% slack time.
+    
+    scenario delayed "delayed"
+  }
+}
+
+rate 200.0
+
+# In order to do a simple profit and loss analysis of the project we
+# specify accounts. One for the development costs, one for the
+# documentation costs, and one account to credit the customer payments
+# to.
+account cost "Project Cost" {
+  account planning "Planning"
+  account dev "Development"
+  account doc "Documentation"
+  account operprep "Operationalization"
+  account operrun "Operations"
+  account infra "Infrastructure Development"
+  account mgmt "Management"
+}
+
+account rev "Payments"
+# The Profit&Loss analysis should be rev - cost accounts.
+balance cost rev
+
+flags team
+
+# -------------------------------------------------------------------------
+# Product Management 
+resource productMgmt "ProductManagers" {
+
+  resource productOwner1 "Stefan L"
+
+  resource productOwner2 "Tom"
+
+  resource productOwner3 "Project PO"
+
+  resource architect1 "Philippe M"
+
+  resource architect2 "Jan W"
+
+  resource architect3 "Fillip G"
+
+  resource platformArchitect "Nick V"
+
+  resource cloud_provider "Cloud Provider Dev" { rate 400 }
+
+  flags team
+}
+
+# -------------------------------------------------------------------------
+# Common requirements for development teams
+# 
+# 1. Strong knowledge of Java & Scala (5+ y)
+# 2. Competent with 2 more other languages: C/C++/C#, Python, R, JavaScript
+# 3. Proven maturity in the agile SDLC
+# 4. Self motivated (does not work by task list)
+# -------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------
+# 1. Scala (7+ Java & 2+ Scala) 
+#
+# 2. High bandwidth communication : strong ability to conceptualize and communicate in concepts of technical and business nature 
+#
+# 3. Prefers to code than to "model" because he/she can express design in code 
+# see http://martinfowler.com/articles/designDead.html and http://c2.com/xp/TheSourceCodeIsTheDesign.html 
+# 
+# 4. Invests in self development at least 20% of his professional time : accrues knowledge using various knowledge mgmt tools, etc.
+#
+# 5. Knowledgeable about Domain Driven Design, specifically the role of the "ubiquitous language" in communication and design. Has applied and is internally compelled to apply in own practice.
+#
+# 6. Good hands experience on with executable specifications (ideally Specs2)
+#
+# 7. Able to effectively plow through large amounts of educational material and code (github, blogs, books, etc) to extract & reuse abstractions.
+#
+# -------------------------------------------------------------------------
+
+resource platformDev "PlatformDevelopers" {
+
+  # Expert in backend development
+  resource platformEng1  "Platform eng #1 (Matthias)"
+
+  resource platformEng2 "Platform eng #2 (Idris)"
+
+  resource platformEng3 "Platform eng #3 (Sigve)"
+
+  resource dataSteward1 "Data Steward #1 (Julien)"
+
+  flags team
+}
+
+# -------------------------------------------------------------------------
+# Responsible for application development
+# Requirements for the applications team (on top of "common")
+#
+# 1. Proven experience with application servers (JBoss, Tomcat, etc)
+#
+# 2. Proven experience with the TypeSafe stack: Play Framework, Akka, SBT, etc
+#
+# 3. Has used modern application architecture design or is willing to invest personal time getting up to speed in 2 months: 
+# - functional domain models
+# - event sourcing
+# - CQRS
+#
+# 5. Good hands on experience with the persistence technologies & layer 
+# -------------------------------------------------------------------------
+resource appDev "ApplicationDevelopers" {
+
+  # Expert in distributed application development
+  resource appDev1 "appDev #1"  { rate 200 }
+
+  # Expert in distributed application development
+  resource appDev2 "appDev #2"  { rate 200 }
+
+  # Expert in frontend development
+  resource feDev3 "feDev #3"  { rate 200 }
+
+  flags team
+}
+
+# -------------------------------------------------------------------------
+# Requirements for DevOps
+# -------------------------------------------------------------------------
+resource devOps "DevOps" {
+
+  resource devOps1 "DevOps #1 (Zargham)" { rate 200.0 }
+
+  resource devOps2 "DevOps #2 (Willem)" { rate 200.0 }
+
+  flags team
+}
+
+# -------------------------------------------------------------------------
+resource qa "QA" {
+
+  resource qa1 "QA #1" { limits { dailymax 6.4h } rate 400.0 }
+
+  resource qa2 "QA #2" { limits { dailymax 6.4h } rate 400.0 }
+
+  flags team
+}
+
+
+# -------------------------------------------------------------------------
+# Smart Data Platform - Development Project
+# -------------------------------------------------------------------------
+task sdpPlatform "SDP" {
+
+  # -------------------------------------------------------------------------
+  # Product Decisioning : functional roadmap, architectural, , etc
+  # -------------------------------------------------------------------------
+  task productDecisioning "Architecture Decisioning" {
+
+      chargeset planning 
+
+      # see
+      task approvePlatform "Approve platform" {
+
+        duration 30d
+        allocate platformArchitect, architect1, architect2, architect3
+      }
+
+      # TODO:
+      task approveApplication "Approve application" {
+
+        duration 20d
+        allocate productOwner1, productOwner3
+      }
+
+      # -------------------------------------------------------------------------
+      #task productVisionReadyForReview "(ms) Product vision ready for review" {
+      #  milestone
+      #  start 2021-03-15
+      #
+      #  depends !approvePlatform, !approveApplication
+      #}
+
+      # -------------------------------------------------------------------------
+      # The product owners / steering group have approved the product vision
+      # This is achieved through discussions with engineering but does not mean engineering has all they need to build
+      #task productVisionApproved "(ms) Product owners approved vision" {
+      #  milestone
+      #  start 2021-03-15
+
+      #  depends !productVisionReadyForReview
+      #}
+
+      # -------------------------------------------------------------------------
+      # Engineering reviewed the product vision and has a high level design to achieve it
+      # What this does not mean:
+      # * it can all be done
+      # * the vision can change substantially without major impact to product, budget or timelines
+      #task productVisionHighLevelDesignReady "(ms) Engineering created a product high level design" {
+      #  milestone
+      #  start 2021-05-01
+
+      #  depends !productVisionApproved
+      #}
+  }
+
+  # -------------------------------------------------------------------------
+  # Platform Development 
+  # #todo
+  # -------------------------------------------------------------------------
+  task platformDevelopment "Platform Development" {
+
+      chargeset dev
+      depends !infrastructureDevelopment.developDevEnv
+
+      #
+      task detailedDesign "Detailed Design" {
+        duration 20d
+        allocate architect1, platformArchitect, platformEng1, appDev1
+
+        #depends !!productDecisioning.productVisionHighLevelDesignReady
+      }
+
+      # -------------------------------------------------------------------------
+      task detailedDesign_done "(ms) Detailed POCs and component design are done" {
+        milestone
+        #start 2016-02-21
+
+        depends !detailedDesign
+      }
+
+      # -------------------------------------------------------------------------
+      task platformReadyToDevelop "(ms) Platform ready to be developed" {
+        milestone
+        #start 2016-03-10
+
+        depends !detailedDesign_done, !!productDecisioning.approvePlatform
+      }
+
+      # -------------------------------------------------------------------------
+      task developPlatform "Develop platform" {
+
+          depends !platformReadyToDevelop
+
+          # see
+          task developDataLakehouse "Develop  (component) data lakehouse" {
+
+            task developDataLakehouse_level1 "Develop data lakehouse - unit test level" {
+              allocate platformEng1, platformEng2, platformArchitect
+              length 30d
+            }
+
+            task developDataLakehouse_level2 "Develop data lakehouse - data collection DEV-ENV level" {
+              allocate platformEng1, platformEng2, platformArchitect
+              length 30d
+            }
+
+            task developDataLakehouse_level3 "Develop data lakehouse - data collection DIT-ENV level"  {
+              allocate platformEng1, platformEng2, platformArchitect
+              length 30d
+            }
+          }
+
+          # see ..
+          task developAssetRegistry "Develop (component) asset-registry" {
+
+            task developAssetRegistry_level1 "Develop asset registry - unit test level" {
+              allocate platformEng3, architect2
+              length 30d
+            }
+
+            task developAssetRegistry_level2 "Develop asset registry - dataset governance" {
+              allocate platformEng3, architect2
+              length 30d
+            }
+
+            task developAssetRegistry_level3 "Develop asset registry - model governance" {
+              allocate platformEng3, architect2
+              length 30d
+            }
+          }
+
+          # see
+          task developOrchestrationEngine "Develop orchestration engine" {
+
+            task developOrchestrationEngine_level1 "Develop orchestration engine - unit test level" {
+              allocate platformEng2, platformArchitect
+              length 10d
+            }
+
+            task developOrchestrationEngine_level2 "Develop orchestration engine - simple data projection level" {
+              allocate platformEng2, platformArchitect
+              length 10d
+            }
+          }
+
+          # ...
+      }
+
+      # -------------------------------------------------------------------------
+      task platformDeveloped "(ms) Platform developed" {
+        milestone
+        #start 2016-03-10
+
+        depends !developPlatform
+      }
+  }
+
+  # -------------------------------------------------------------------------
+  # Application Development 
+  #
+  # -------------------------------------------------------------------------
+  task applicationDevelopment "Application & Business Process Development" {
+
+    allocate appDev
+    chargeset dev
+
+    #
+    task developExperimentalDataAnalysis "Develop experimental data analysis" {
+      duration 10d
+      allocate architect1
+      allocate platformEng1
+      allocate dataSteward1
+      allocate appDev1
+
+      depends !platformDevelopment.developPlatform.developDataLakehouse_level2
+    }
+
+    #
+    task developExperimentalPresentation "Develop experimental presentation" {
+      duration 10d
+      allocate architect1
+      allocate appDev1
+
+      depends !developExperimentalDataAnalysis
+    }
+
+    #todo
+  }
+
+  task infrastructureDevelopment "Infrastructure Development" {
+
+    chargeset dev
+
+    # depends !platformDevelopment.platformReadyToDevelop
+
+    task developDevEnv "Develop platform DEV-ENV" {
+      length 60d
+	    allocate devOps2
+    }
+
+    # see
+    task developServiceMesh "Develop service mesh" {
+      length 60d
+	    allocate devOps1
+    }
+
+    # see
+    #task developPlatformEnv "Develop platform PROD-ENV" {
+
+    #  depends !developDevEnv
+    #  length 120d
+	  #  allocate devOps2
+    #}
+  }
+
+  # -------------------------------------------------------------------------
+  #
+  # -------------------------------------------------------------------------
+  task integrateInternalProductRelease "Integrate internal product release" {
+
+    duration 20d #pessim40d
+    chargeset operprep
+    allocate platformDev, appDev, devOps, qa
+
+    depends !infrastructureDevelopment, !platformDevelopment, !applicationDevelopment
+  }
+
+  # -------------------------------------------------------------------------
+  #
+  # -------------------------------------------------------------------------
+  task passTestingOfInternalProductRelease "Test internal product release" {
+    duration 20d
+
+    chargeset operprep
+    allocate qa
+
+    depends !integrateInternalProductRelease
+  }
+
+  # -------------------------------------------------------------------------
+  task milestones "Milestones" {
+
+      # Some milestones have customer payments associated with them. We
+      # credit these payments to the 'rev' account.
+      #account rev
+
+      task start "(ms) Project start" {
+        # A task that has no duration is a milestone. It only needs a
+        # start or end criterion. All other tasks depend on this task.
+        milestone
+        start 2021-03-01
+        # For some reason the actual start of the project got delayed.
+        # We record this, so that we can compare the planned run to the
+        # delayed run of the project.
+        #TBD delayed:start 2016-01-10
+
+        # At the beginning of this task we receive a payment from the
+        # customer. This is credited to the account associated with this
+        # task when the task starts.
+        startcredit 10000000.0
+      }
+
+      # -------------------------------------------------------------------------
+      task internalReleaseReady "(ms) Internal release ready" {
+        milestone
+
+        depends !!integrateInternalProductRelease
+      }
+
+      # -------------------------------------------------------------------------
+      task internalReleaseTestingPasses "(ms) Internal release passes testing" {
+        milestone
+
+        depends !!passTestingOfInternalProductRelease
+      }
+
+      # -------------------------------------------------------------------------
+      task done "(ms) Demo internal release to Customer" {
+        milestone
+
+        depends !internalReleaseTestingPasses
+      }
+  }  
+}
+
+
+
+# -------------------------------------------------------------------------
+# Now the project has been specified completely. Stopping here would
+# result in a valid TaskJuggler file that could be processed and
+# scheduled. But no reports would be generated to visualize the
+# results.
+
+navigator navbar {
+  hidereport @none
+}
+
+macro TaskTip [
+  tooltip istask() -8<-
+    '''Start: ''' <-query attribute='start'->
+    '''End: ''' <-query attribute='end'->
+    ----
+    '''Resources:'''
+
+    <-query attribute='resources'->
+    ----
+    '''Precursors: '''
+
+    <-query attribute='precursors'->
+    ----
+    '''Followers: '''
+
+    <-query attribute='followers'->
+    ->8-
+]
+
+textreport frame "" {
+  header -8<-
+    == CC Platform Project ==
+    <[navigator id="navbar"]>
+  ->8-
+  footer "----"
+  textreport index "Overview" {
+    formats html
+    center '<[report id="overview"]>'
+  }
+
+  textreport "Status" {
+    formats html
+    center -8<-
+      <[report id="status.dashboard"]>
+      ----
+      <[report id="status.completed"]>
+      ----
+      <[report id="status.ongoing"]>
+      ----
+      <[report id="status.future"]>
+    ->8-
+  }
+
+  textreport development "Development" {
+    formats html
+    center '<[report id="development"]>'
+  }
+
+  textreport "Deliveries" {
+    formats html
+    center '<[report id="deliveries"]>'
+  }
+
+  textreport "ContactList" {
+    formats html
+    title "Contact List"
+    center '<[report id="contactList"]>'
+  }
+  textreport "ResourceGraph" {
+    formats html
+    title "Resource Graph"
+    center '<[report id="resourceGraph"]>'
+  }
+}
+
+# A traditional Gantt chart with a project overview.
+taskreport overview "" {
+  header -8<-
+    === Project Overview ===
+
+    The project is structured into 3 phases.
+
+    # Specification
+    # <-reportlink id='frame.development'->
+    # Testing
+
+    === Original Project Plan ===
+  ->8-
+  columns bsi { title 'WBS' },
+          name, start, end, effort, cost,
+          revenue, chart { ${TaskTip} }
+  # For this report we like to have the abbreviated weekday in front
+  # of the date. %a is the tag for this.
+  timeformat "%a %Y-%m-%d"
+  loadunit days
+  hideresource @all
+  balance cost rev
+  caption 'All effort values are in man days.'
+
+  footer -8<-
+    === Staffing ===
+
+    All project phases are properly staffed. See [[ResourceGraph]] for
+    detailed resource allocations.
+
+    === Current Status ===
+
+    The project started off with a delay of 4 days. This slightly affected
+    the original schedule. See [[Deliveries]] for the impact on the
+    delivery dates.
+  ->8-
+}
+
+# Macro to set the background color of a cell according to the alert
+# level of the task.
+macro AlertColor [
+  cellcolor plan.alert = 0 "#00D000" # green
+  cellcolor plan.alert = 1 "#D0D000" # yellow
+  cellcolor plan.alert = 2 "#D00000" # red
+]
+
+taskreport status "" {
+  columns bsi { width 50 title 'WBS' }, name { width 150 },
+          start { width 100 }, end { width 100 },
+          effort { width 100 },
+          alert { tooltip plan.journal
+                          != '' "<-query attribute='journal'->" width 150 },
+          status { width 150 }
+  scenarios delayed
+
+  taskreport dashboard "" {
+    headline "Project Dashboard (<-query attribute='now'->)"
+    columns name { title "Task" ${AlertColor} width 200},
+            resources { width 200 ${AlertColor}
+                        listtype bullets
+                        listitem "<-query attribute='name'->"
+                        start ${projectstart} end ${projectend} },
+            alerttrend { title "Trend" ${AlertColor} width 50 },
+            journal { width 350 ${AlertColor} }
+    journalmode status_up
+    journalattributes headline, author, date, summary, details
+    hidetask ~hasalert(0)
+    sorttasks alert.down, delayed.end.up
+    period %{${now} - 1w} +1w
+  }
+  taskreport completed "" {
+    headline "Already completed tasks"
+    hidetask ~(delayed.end <= ${now})
+  }
+  taskreport ongoing "" {
+    headline "Ongoing tasks"
+    hidetask ~((delayed.start <= ${now}) & (delayed.end > ${now}))
+  }
+  taskreport future "" {
+    headline "Future tasks"
+    hidetask ~(delayed.start > ${now})
+  }
+}
+
+# A list of tasks showing the resources assigned to each task.
+taskreport development "" {
+  scenarios delayed
+  headline "Development - Resource Allocation Report"
+  columns bsi { title 'WBS' }, name, start, end, effort { title "Work" },
+          duration, chart { ${TaskTip} scale day width 500 }
+  timeformat "%Y-%m-%d"
+  hideresource ~(isleaf() & isleaf_())
+  sortresources name.up
+}
+
+# A list of all tasks with the percentage completed for each task
+taskreport deliveries "" {
+  headline "Project Deliverables"
+  columns bsi { title 'WBS' }, name, start, end, note { width 150 }, complete,
+          chart { ${TaskTip} }
+  taskroot sdpPlatform.milestones
+  hideresource @all
+  scenarios plan, delayed
+}
+# A list of all employees with their contact details.
+resourcereport contactList "" {
+  scenarios delayed
+  headline "Contact list and duty plan"
+  columns name,
+          email { celltext 1 "[mailto:<-email-> <-email->]" },
+          #phone,
+          managers { title "Manager" },
+          chart { scale day }
+  hideresource ~isleaf()
+  sortresources name.up
+  hidetask @all
+}
+
+# A graph showing resource allocation. It identifies whether each
+# resource is under- or over-allocated for.
+resourcereport resourceGraph "" {
+  scenarios delayed
+  headline "Resource Allocation Graph"
+  columns no, name, effort, rate, weekly { ${TaskTip} }
+  loadunit shortauto
+  # We only like to show leaf tasks for leaf resources.
+  hidetask ~(isleaf() & isleaf_())
+  sorttasks plan.start.up
+}
+
