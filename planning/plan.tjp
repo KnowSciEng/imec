@@ -94,7 +94,7 @@ resource productMgmt "ProductManagers" {
 resource platformDev "PlatformDevelopers" {
 
   # Expert in backend development
-  resource platformEng1  "Platform eng #1 (Matthias)"
+  resource platformEng1 "Platform eng #1 (Matthias)"
 
   resource platformEng2 "Platform eng #2 (Idris)"
 
@@ -248,28 +248,28 @@ task sdpPlatform "SDP" {
       }
 
       # -------------------------------------------------------------------------
-      task dev_Platform "Develop platform" {
+      task dev_Platform "Develop SDP" {
 
           depends !platformReadyToDevelop
 
           # see
-          task dev_DataLakehouse "Develop  (component) data lakehouse" {
+          task dev_DataLakehouse "Develop (component) data lakehouse" {
 
             task level1 "Develop data lakehouse - unit test level" {
               allocate platformEng1, platformEng2, platformArchitect
-              length 30d
+              length 20d
             }
 
             task level2 "Develop data lakehouse - data collection DEV-ENV level" {
               allocate platformEng1, platformEng2, platformArchitect
-              length 30d
+              length 20d
 
               depends !level1
             }
 
             task level3 "Develop data lakehouse - data collection DIT-ENV level"  {
               allocate platformEng1, platformEng2, platformArchitect
-              length 30d
+              length 20d
 
               depends !level2
             }
@@ -299,16 +299,25 @@ task sdpPlatform "SDP" {
           }
 
           # see
-          task dev_OrchestrationEngine "Develop orchestration engine" {
+          task dev_OrchestrationEngine "Develop (component) orchestration engine" {
 
             task level1 "Develop orchestration engine - unit test level" {
               allocate platformEng2, platformArchitect
-              length 10d
+              length 15d
             }
 
             task level2 "Develop orchestration engine - simple data projection level" {
               allocate platformEng2, platformArchitect
-              length 10d
+              length 25d
+
+              depends !level1
+            }
+
+            task level3 "Develop orchestration engine - complex model management level" {
+              allocate platformEng2, platformArchitect
+              length 25d
+
+              depends !level2
             }
           }
 
@@ -334,7 +343,7 @@ task sdpPlatform "SDP" {
     chargeset dev
 
     #
-    task developExperimentalDataAnalysis "Develop experimental data analysis" {
+    task developExperimentalDataAnalysis "Develop application experimental data analysis" {
       duration 10d
       allocate architect1
       allocate platformEng1
@@ -345,7 +354,7 @@ task sdpPlatform "SDP" {
     }
 
     #
-    task developExperimentalPresentation "Develop experimental presentation" {
+    task developExperimentalPresentation "Develop application experimental visualizations" {
       duration 10d
       allocate architect1
       allocate appDev1
@@ -353,13 +362,26 @@ task sdpPlatform "SDP" {
       depends !developExperimentalDataAnalysis
     }
 
-    task developDataProjection "Develop data projection" {
+    task developDataProjection "Develop application data projections" {
       duration 20d
       allocate platformEng2
       allocate platformArchitect
 
       depends sdpPlatform.platformDevelopment.dev_Platform.dev_DataLakehouse.level2
       depends sdpPlatform.platformDevelopment.dev_Platform.dev_OrchestrationEngine.level2
+
+      depends !developExperimentalPresentation
+    }
+
+    task developDataPService "Develop application data services" {
+      duration 20d
+      allocate platformEng2
+      allocate platformArchitect
+
+      depends sdpPlatform.platformDevelopment.dev_Platform.dev_DataLakehouse.level2
+      depends sdpPlatform.platformDevelopment.dev_Platform.dev_OrchestrationEngine.level2
+
+      depends !developDataProjection
     }
     #todo
   }
@@ -371,13 +393,13 @@ task sdpPlatform "SDP" {
     # depends !platformDevelopment.platformReadyToDevelop
 
     task developDevEnv "Develop platform DEV-ENV" {
-      length 60d
+      length 20d
 	    allocate devOps2
     }
 
     # see
     task developServiceMesh "Develop service mesh" {
-      length 60d
+      length 20d
 	    allocate devOps1
     }
 
