@@ -147,6 +147,16 @@ resource devOps "DevOps" {
 }
 
 # -------------------------------------------------------------------------
+# Requirements for ModelMgmt
+# -------------------------------------------------------------------------
+resource ModelMgmt "ModelMgmt" {
+
+  resource modelProvider1 "Model Provider #1 " { rate 500.0 }
+
+  flags team
+}
+
+# -------------------------------------------------------------------------
 resource qa "QA" {
 
   resource qa1 "QA #1" { limits { dailymax 6.4h } rate 400.0 }
@@ -303,19 +313,19 @@ task sdpPlatform "SDP" {
 
             task level1 "Develop orchestration engine - unit test level" {
               allocate platformEng2, platformArchitect
-              length 15d
+              effort 25d
             }
 
             task level2 "Develop orchestration engine - simple data projection level" {
               allocate platformEng2, platformArchitect
-              length 25d
+              effort 45d
 
               depends !level1
             }
 
             task level3 "Develop orchestration engine - complex model management level" {
               allocate platformEng2, platformArchitect
-              length 25d
+              effort 65d
 
               depends !level2
             }
@@ -330,6 +340,66 @@ task sdpPlatform "SDP" {
         #start 2016-03-10
 
         depends !dev_Platform
+      }
+  }
+
+  # -------------------------------------------------------------------------
+  # Model Development & Integration
+  # #todo
+  # -------------------------------------------------------------------------
+  task modelManagement "Model Management" {
+
+      chargeset dev
+      depends !infrastructureDevelopment.developDevEnv
+
+      #
+      task apply_AssetGovernance "Apply asset governance to model & inputs" {
+        duration 7d
+        allocate architect1, platformEng1, modelProvider1
+
+        note "As per https://imec.atlassian.net/wiki/spaces/ML/pages/4087939145/%28epic%29+Cityflows-SDP+integration+schema+iteration%231?focusedCommentId=4238868482#comment-4238868482"
+        depends !!platformDevelopment.dev_Platform.dev_DataLakehouse.level2
+      }
+
+      #
+      task dev_AnalysisScenarios "Develop analysis scenarios for client use cases" {
+        duration 15d
+        allocate architect1, platformEng1, modelProvider1
+
+        depends !apply_AssetGovernance
+      }
+
+      #
+      task apply_DataManagement "Bring model inputs under management" {
+        duration 10d
+        allocate architect1, platformEng1, modelProvider1
+
+        depends !dev_AnalysisScenarios
+      }
+
+      #
+      task dev_ProvideAnalysisSessionTraces "Execute analysis sessions for each scenarios & capture traces" {
+        duration 17d
+        allocate architect1, platformEng1, modelProvider1
+
+        depends !apply_DataManagement
+      }
+
+      #
+      task dev_ApplicationToQueryAnalysisSessionTraces "Develop analysis sessions querying for decision making" {
+        duration 20d
+        allocate architect1, platformEng1, modelProvider1
+
+        depends !dev_ProvideAnalysisSessionTraces
+      }
+
+      task dev_AnalysisExecutionIntegration "Develop analysis session integration" {
+        duration 15d
+        allocate architect1, platformEng1, modelProvider1
+
+        depends !apply_DataManagement
+        depends !!platformDevelopment.dev_Platform.dev_OrchestrationEngine.level3
+        depends !!applicationDevelopment.developDataPService
       }
   }
 
@@ -350,7 +420,7 @@ task sdpPlatform "SDP" {
       allocate dataSteward1
       allocate appDev1
 
-      depends sdpPlatform.platformDevelopment.dev_Platform.dev_DataLakehouse.level2
+      depends !!platformDevelopment.dev_Platform.dev_DataLakehouse.level2
     }
 
     #
@@ -367,8 +437,8 @@ task sdpPlatform "SDP" {
       allocate platformEng2
       allocate platformArchitect
 
-      depends sdpPlatform.platformDevelopment.dev_Platform.dev_DataLakehouse.level2
-      depends sdpPlatform.platformDevelopment.dev_Platform.dev_OrchestrationEngine.level2
+      depends !!platformDevelopment.dev_Platform.dev_DataLakehouse.level2
+      depends !!platformDevelopment.dev_Platform.dev_OrchestrationEngine.level2
 
       depends !developExperimentalPresentation
     }
@@ -378,8 +448,8 @@ task sdpPlatform "SDP" {
       allocate platformEng2
       allocate platformArchitect
 
-      depends sdpPlatform.platformDevelopment.dev_Platform.dev_DataLakehouse.level2
-      depends sdpPlatform.platformDevelopment.dev_Platform.dev_OrchestrationEngine.level2
+      depends !!platformDevelopment.dev_Platform.dev_DataLakehouse.level2
+      depends !!platformDevelopment.dev_Platform.dev_OrchestrationEngine.level2
 
       depends !developDataProjection
     }
