@@ -399,7 +399,7 @@ task sdpPlatform "SDP" {
 
         depends !apply_DataManagement
         depends !!platformDevelopment.dev_Platform.dev_OrchestrationEngine.level3
-        depends !!applicationDevelopment.developDataPService
+        depends !!applicationDevelopment.dev_DataPService
       }
   }
 
@@ -413,7 +413,7 @@ task sdpPlatform "SDP" {
     chargeset dev
 
     #
-    task developExperimentalDataAnalysis "Develop application experimental data analysis" {
+    task dev_ExperimentalDataAnalysis "Develop application experimental data analysis" {
       duration 10d
       allocate architect1
       allocate platformEng1
@@ -429,10 +429,10 @@ task sdpPlatform "SDP" {
       allocate architect1
       allocate appDev1
 
-      depends !developExperimentalDataAnalysis
+      depends !dev_ExperimentalDataAnalysis
     }
 
-    task developDataProjection "Develop application data projections" {
+    task dev_DataProjection "Develop application data projections" {
       duration 20d
       allocate platformEng2
       allocate platformArchitect
@@ -443,7 +443,7 @@ task sdpPlatform "SDP" {
       depends !developExperimentalPresentation
     }
 
-    task developDataPService "Develop application data services" {
+    task dev_DataPService "Develop application data services" {
       duration 20d
       allocate platformEng2
       allocate platformArchitect
@@ -451,7 +451,7 @@ task sdpPlatform "SDP" {
       depends !!platformDevelopment.dev_Platform.dev_DataLakehouse.level2
       depends !!platformDevelopment.dev_Platform.dev_OrchestrationEngine.level2
 
-      depends !developDataProjection
+      depends !dev_DataProjection
     }
     #todo
   }
@@ -468,7 +468,7 @@ task sdpPlatform "SDP" {
     }
 
     # see
-    task developServiceMesh "Develop service mesh" {
+    task dev_ServiceMesh "Develop service mesh" {
       length 20d
 	    allocate devOps1
     }
